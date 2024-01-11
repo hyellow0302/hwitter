@@ -1,9 +1,8 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_API_KEY,
+  apiKey: import.meta.env.VITE_APP_API_KEY,
   authDomain: "hwitter-9683b.firebaseapp.com",
   projectId: "hwitter-9683b",
   storageBucket: "hwitter-9683b.appspot.com",
@@ -12,5 +11,4 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
