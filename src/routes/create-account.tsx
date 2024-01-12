@@ -1,5 +1,8 @@
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { styled } from "styled-components";
+import { auth } from "../firebase";
 
 const Wrapper = styled.div`
   height: 100%;
@@ -39,6 +42,7 @@ const Error = styled.span`
 `;
 
 export default function Account() {
+  const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -58,15 +62,29 @@ export default function Account() {
     }
   };
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (isLoading || name === "" || email === "" || password === "") return;
     try {
-      // console.log(name, email, password);
-      // 계정 생성
-      // 유저 이름 세팅 (firebase에서 userName을 필요로 하기때문)
-      // 계정 생성이 완료되면 홈페이지로 리다이렉트
+      setLoading(true);
+      /* 계정 생성 */
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      ); // 회원가입에 성공하면 자격증명을 얻게 됨. credentials에 담음.
+      console.log(credentials.user);
+
+      /* 유저 이름 세팅 (firebase에서 userName을 필요로 하기때문) */
+      await updateProfile(credentials.user, {
+        displayName: name,
+      });
+
+      /* 계정 생성이 완료되면 홈페이지로 리다이렉트 */
+      navigate("/");
     } catch (e) {
-      // 오류 제어
+      /* 오류 제어 */
+      // 해당 이메일로 이미 계정이 존재하거나, 비밀번호가 유효하지않을 때 createUserWithEmailAndPassword에서 오류를 반환하게 됨, 그럼 여기서 캐치!
     } finally {
       setLoading(false);
     }
@@ -74,7 +92,7 @@ export default function Account() {
 
   return (
     <Wrapper>
-      <Title>Login to 𝕏</Title>
+      <Title>Join to 𝕏</Title>
       <Form onSubmit={onSubmit}>
         <Input
           onChange={onChange}
