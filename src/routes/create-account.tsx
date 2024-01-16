@@ -11,6 +11,7 @@ import {
   Error,
   Switcher,
 } from "../component/auth-component";
+import GihubButton from "../component/github-btn";
 
 export default function Account() {
   const navigate = useNavigate();
@@ -103,6 +104,7 @@ export default function Account() {
         계정이 있으신가요? 지금 바로 로그인하세요!{" "}
         <Link to="/login">로그인 &rarr;</Link>
       </Switcher>
+      <GihubButton />
     </Wrapper>
   );
 }
