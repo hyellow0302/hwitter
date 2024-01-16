@@ -1,45 +1,16 @@
+import { FirebaseError } from "firebase/app";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { styled } from "styled-components";
+import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-
-const Wrapper = styled.div`
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 420px;
-  padding: 50px 0px;
-`;
-const Title = styled.h1`
-  font-size: 42px;
-`;
-const Form = styled.form`
-  margin-top: 50px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-`;
-const Input = styled.input`
-  padding: 10px 20px;
-  border-radius: 50px;
-  border: none;
-  width: 100%;
-  font-size: 16px;
-  &[type="submit"] {
-    cursor: pointer;
-    &:hover {
-      opacity: 0.8;
-    }
-  }
-`;
-
-const Error = styled.span`
-  font-weight: 600;
-  color: tomato;
-`;
+import {
+  Wrapper,
+  Title,
+  Form,
+  Input,
+  Error,
+  Switcher,
+} from "../component/auth-component";
 
 export default function Account() {
   const navigate = useNavigate();
@@ -64,6 +35,7 @@ export default function Account() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError("");
     if (isLoading || name === "" || email === "" || password === "") return;
     try {
       setLoading(true);
@@ -85,6 +57,9 @@ export default function Account() {
     } catch (e) {
       /* 오류 제어 */
       // 해당 이메일로 이미 계정이 존재하거나, 비밀번호가 유효하지않을 때 createUserWithEmailAndPassword에서 오류를 반환하게 됨, 그럼 여기서 캐치!
+      if (e instanceof FirebaseError) {
+        setError(e.message);
+      }
     } finally {
       setLoading(false);
     }
@@ -124,6 +99,10 @@ export default function Account() {
         />
       </Form>
       {error !== "" ? <Error>{error}</Error> : null}
+      <Switcher>
+        계정이 있으신가요? 지금 바로 로그인하세요!{" "}
+        <Link to="/login">로그인 &rarr;</Link>
+      </Switcher>
     </Wrapper>
   );
 }
