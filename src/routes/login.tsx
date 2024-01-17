@@ -35,7 +35,6 @@ export default function Login() {
     e.preventDefault();
     setError("");
     if (isLoading || email === "" || password === "") return;
-
     try {
       setLoading(true);
       await signInWithEmailAndPassword(auth, email, password);
