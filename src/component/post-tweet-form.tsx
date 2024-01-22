@@ -68,10 +68,14 @@ export default function PostTweetForm() {
     setTweet(e.target.value);
   };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const maxFile = 1024 * 1024;
     const { files } = e.target;
-    if (files && files.length === 1) {
-      setFile(files[0]);
+    if (files && files[0].size > maxFile) {
+      alert("1MB 이하의 이미지만 등록이 가능합니다.");
+      setFile(null);
+      return;
     }
+    if (files.length === 1) setFile(files[0]);
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
