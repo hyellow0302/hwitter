@@ -93,10 +93,8 @@ export default function PostTweetForm() {
         userId: user.uid,
       });
       if (file) {
-        const locationRef = ref(
-          storage,
-          `tweets/${user.uid}-${user.displayName}/${doc.id}`
-        );
+        // 사진 이름을 doc.id와 같게 해준다. (tweet id와)
+        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`);
         const result = await uploadBytes(locationRef, file);
         // 이미지 url 얻는 과정
         const url = await getDownloadURL(result.ref);
