@@ -10,10 +10,13 @@ const Wrapper = styled.div`
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
   border-radius: 15px;
-  margin: 10px;
 `;
 
-const Column = styled.div``;
+const Column = styled.div`
+  &:last-child {
+    place-self: end;
+  }
+`;
 
 const Photo = styled.img`
   width: 100px;
@@ -22,7 +25,7 @@ const Photo = styled.img`
 `;
 
 const Username = styled.span`
-  font-wegiht: 600;
+  font-weight: 600;
   font-size: 15px;
 `;
 

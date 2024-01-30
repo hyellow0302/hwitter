@@ -17,14 +17,14 @@ export interface ITweet {
   tweet: string;
   userId: string;
   username: string;
-  createAt: number;
+  createdAt: number;
 }
 
 const Wrapper = styled.div`
   display: flex;
   gap: 10px;
   flex-direction: column;
-  overflow: scroll;
+  overflow-y: scroll;
 `;
 
 export default function Timeline() {
@@ -35,7 +35,7 @@ export default function Timeline() {
     const fetchTweets = async () => {
       const tweetsQuery = query(
         collection(db, "tweets"),
-        orderBy("createAt", "desc"),
+        orderBy("createdAt", "desc"),
         limit(25)
       );
       // 데이터베이스 및 쿼리와 실시간 연결을 생성하는 함수 onSnapshot()
@@ -44,10 +44,10 @@ export default function Timeline() {
       unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
         const tweets = snapshot.docs.map((doc) => {
           // console.log(doc.data());
-          const { tweet, createAt, userId, username, photo } = doc.data();
+          const { tweet, createdAt, userId, username, photo } = doc.data();
           return {
             tweet,
-            createAt,
+            createdAt,
             userId,
             username,
             photo,

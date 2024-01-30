@@ -1,8 +1,18 @@
-import { updateProfile } from "firebase/auth";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useState } from "react";
 import { styled } from "styled-components";
-import { auth, storage } from "../firebase";
+import { auth, db, storage } from "../firebase";
+import { useEffect, useState } from "react";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { updateProfile } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { ITweet } from "../component/timeline";
+import Tweet from "../component/tweet";
 
 const Wrapper = styled.div`
   display: flex;
@@ -10,13 +20,12 @@ const Wrapper = styled.div`
   flex-direction: column;
   gap: 20px;
 `;
-
 const AvatarUpload = styled.label`
   width: 80px;
   overflow: hidden;
   height: 80px;
   border-radius: 50%;
-  background-color: #1fd9bf0;
+  background-color: #1d9bf0;
   cursor: pointer;
   display: flex;
   justify-content: center;
@@ -29,31 +38,31 @@ const AvatarUpload = styled.label`
 const AvatarImg = styled.img`
   width: 100%;
 `;
-
 const AvatarInput = styled.input`
   display: none;
 `;
-
 const Name = styled.span`
   font-size: 22px;
+`;
+
+const Tweets = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
-  // 파일 선택시 저장하기 위한 함수
+  const [tweets, setTweets] = useState<ITweet[]>([]);
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return;
-    // 파일이 1개가 선택되었다면
     if (files && files.length === 1) {
-      // 파일을 선언하고
       const file = files[0];
-      // 파일을 저장할 곳을 찾기
-      const locationRef = ref(storage, `avatars/${user?.uid}`); // 이렇게 해야 유저가 사진을 계속 변경해도 모두 저장하지않고 덮어쓰기 할 수 있음 (비용절약)
-      // uploadBytes로 파일을 업로드
+      const locationRef = ref(storage, `avatars/${user?.uid}`);
       const result = await uploadBytes(locationRef, file);
-      // 사진 url을 얻어옴
       const avatarUrl = await getDownloadURL(result.ref);
       setAvatar(avatarUrl);
       await updateProfile(user, {
@@ -61,24 +70,46 @@ export default function Profile() {
       });
     }
   };
-
+  const fetchTweets = async () => {
+    console.log(user?.uid, "dd");
+    const tweetQuery = query(
+      collection(db, "tweets"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(25)
+    );
+    const snapshot = await getDocs(tweetQuery);
+    const tweets = snapshot.docs.map((doc) => {
+      console.log(doc);
+      const { tweet, createdAt, userId, username, photo } = doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        username,
+        photo,
+        id: doc.id,
+      };
+    });
+    console.log(tweets);
+    setTweets(tweets);
+  };
+  useEffect(() => {
+    fetchTweets();
+  }, []);
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
-        {Boolean(avatar) ? (
+        {avatar ? (
           <AvatarImg src={avatar} />
         ) : (
           <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-6 h-6"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
           >
-            <path
-              fill-rule="evenodd"
-              d="M18.685 19.097A9.723 9.723 0 0 0 21.75 12c0-5.385-4.365-9.75-9.75-9.75S2.25 6.615 2.25 12a9.723 9.723 0 0 0 3.065 7.097A9.716 9.716 0 0 0 12 21.75a9.716 9.716 0 0 0 6.685-2.653Zm-12.54-1.285A7.486 7.486 0 0 1 12 15a7.486 7.486 0 0 1 5.855 2.812A8.224 8.224 0 0 1 12 20.25a8.224 8.224 0 0 1-5.855-2.438ZM15.75 9a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
-              clip-rule="evenodd"
-            />
+            <path d="M10 8a3 3 0 100-6 3 3 0 000 6zM3.465 14.493a1.23 1.23 0 00.41 1.412A9.957 9.957 0 0010 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 00-13.074.003z" />
           </svg>
         )}
       </AvatarUpload>
@@ -89,6 +120,11 @@ export default function Profile() {
         accept="image/*"
       />
       <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <Tweets>
+        {tweets.map((tweet) => (
+          <Tweet key={tweet.id} {...tweet} />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 }

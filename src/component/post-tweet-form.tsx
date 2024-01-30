@@ -36,7 +36,7 @@ const AttachFileButton = styled.label`
   text-align: center;
   border-radius: 20px;
   border: 1px solid #1d9bf0;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 `;
@@ -51,11 +51,11 @@ const SubmitBtn = styled.input`
   border: none;
   padding: 10px 0px;
   border-radius: 20px;
-  font-size: 16px;l
+  font-size: 16px;
   cursor: pointer;
   &:hover,
   &:active {
-    opacity: 0.8;
+    opacity: 0.9;
   }
 `;
 
@@ -75,7 +75,7 @@ export default function PostTweetForm() {
       setFile(null);
       return;
     }
-    if (files.length === 1) setFile(files[0]);
+    if (files && files.length === 1) setFile(files[0]);
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -88,7 +88,7 @@ export default function PostTweetForm() {
       setLoading(true);
       const doc = await addDoc(collection(db, "tweets"), {
         tweet,
-        createAt: Date.now(),
+        createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
@@ -103,9 +103,8 @@ export default function PostTweetForm() {
           photo: url,
         });
       }
-
       setTweet("");
-      setFile("");
+      setFile(null);
     } catch (e) {
       console.log(e);
     } finally {
