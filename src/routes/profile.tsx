@@ -22,6 +22,7 @@ const Wrapper = styled.div`
 `;
 const AvatarUpload = styled.label`
   width: 80px;
+  overflow-y: scroll;
   overflow: hidden;
   height: 80px;
   border-radius: 50%;
@@ -71,7 +72,6 @@ export default function Profile() {
     }
   };
   const fetchTweets = async () => {
-    console.log(user?.uid, "dd");
     const tweetQuery = query(
       collection(db, "tweets"),
       where("userId", "==", user?.uid),
