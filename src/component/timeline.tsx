@@ -5,6 +5,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  Timestamp,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { styled } from "styled-components";
@@ -18,6 +19,7 @@ export interface ITweet {
   userId: string;
   username: string;
   createdAt: number;
+  date: string;
 }
 
 const Wrapper = styled.div`
@@ -43,10 +45,12 @@ export default function Timeline() {
       unsubscribe = await onSnapshot(tweetsQuery, (snapshot) => {
         const tweets = snapshot.docs.map((doc) => {
           // console.log(doc.data());
-          const { tweet, createdAt, userId, username, photo } = doc.data();
+          const { tweet, createdAt, date, userId, username, photo } =
+            doc.data();
           return {
             tweet,
             createdAt,
+            date,
             userId,
             username,
             photo,

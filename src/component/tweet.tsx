@@ -6,6 +6,7 @@ import { ITweet } from "./timeline";
 
 const Wrapper = styled.div`
   display: flex;
+  justify-content: space-between;
   grid-template-columns: 3fr 1fr;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.5);
@@ -27,6 +28,13 @@ const Photo = styled.img`
 const Username = styled.span`
   font-weight: 600;
   font-size: 15px;
+  margin-right: 10px;
+`;
+
+const UploadeDate = styled.span`
+  font-weight: 600;
+  font-size: 15px;
+  color: gray;
 `;
 
 const Payload = styled.p`
@@ -46,7 +54,14 @@ const DeleteButton = styled.button`
   cursor: pointer;
 `;
 
-export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
+export default function Tweet({
+  username,
+  photo,
+  date,
+  tweet,
+  userId,
+  id,
+}: ITweet) {
   const user = auth.currentUser;
   const onDelete = async () => {
     const ok = confirm("게시글을 삭제하시겠습니까?");
@@ -68,6 +83,7 @@ export default function Tweet({ username, photo, tweet, userId, id }: ITweet) {
     <Wrapper>
       <Column>
         <Username>{username}</Username>
+        <UploadeDate>{date}</UploadeDate>
         <Payload>{tweet}</Payload>
         {user?.uid === userId ? (
           <DeleteButton onClick={onDelete}>삭제</DeleteButton>

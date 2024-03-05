@@ -78,6 +78,34 @@ export default function PostTweetForm() {
     if (files && files.length === 1) setFile(files[0]);
   };
 
+  const nowDate = () => {
+    let timestamp = new Date().getTime();
+
+    let date = new Date(timestamp); //타임스탬프를 인자로 받아 Date 객체 생성
+
+    /* 생성한 Date 객체에서 년, 월, 일, 시, 분을 각각 문자열 곧바로 추출 */
+    var year = date.getFullYear().toString().slice(-2); //년도 뒤에 두자리
+    var month = ("0" + (date.getMonth() + 1)).slice(-2); //월 2자리 (01, 02 ... 12)
+    var day = ("0" + date.getDate()).slice(-2); //일 2자리 (01, 02 ... 31)
+    var hour = ("0" + date.getHours()).slice(-2); //시 2자리 (00, 01 ... 23)
+    var minute = ("0" + date.getMinutes()).slice(-2); //분 2자리 (00, 01 ... 59)
+    var second = ("0" + date.getSeconds()).slice(-2); //초 2자리 (00, 01 ... 59)
+
+    var returnDate =
+      year +
+      "." +
+      month +
+      "." +
+      day +
+      ". " +
+      hour +
+      ":" +
+      minute +
+      ":" +
+      second;
+    return returnDate;
+  };
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
@@ -86,9 +114,11 @@ export default function PostTweetForm() {
 
     try {
       setLoading(true);
+
       const doc = await addDoc(collection(db, "tweets"), {
         tweet,
         createdAt: Date.now(),
+        date: nowDate(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });

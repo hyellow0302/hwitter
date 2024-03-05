@@ -42,8 +42,9 @@ const AvatarImg = styled.img`
 const AvatarInput = styled.input`
   display: none;
 `;
-const Name = styled.span`
-  font-size: 22px;
+const Name = styled.div`
+  display: grid;
+  place-items: center;
 `;
 
 const Tweets = styled.div`
@@ -51,6 +52,12 @@ const Tweets = styled.div`
   width: 100%;
   flex-direction: column;
   gap: 10px;
+`;
+
+const EditName = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 `;
 
 export default function Profile() {
@@ -71,6 +78,9 @@ export default function Profile() {
       });
     }
   };
+
+  const onNameChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {};
+
   const fetchTweets = async () => {
     const tweetQuery = query(
       collection(db, "tweets"),
@@ -119,7 +129,15 @@ export default function Profile() {
         type="file"
         accept="image/*"
       />
-      <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <Name>
+        {user ? (
+          <EditName id="name" type="text" onClick={onNameChange}>
+            {user.displayName}
+          </EditName>
+        ) : (
+          "Anonymous"
+        )}
+      </Name>
       <Tweets>
         {tweets.map((tweet) => (
           <Tweet key={tweet.id} {...tweet} />
